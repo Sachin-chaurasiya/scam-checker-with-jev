@@ -1,0 +1,24 @@
+{
+  "name": "scam-checker",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test lib/*.test.ts scripts/*.test.ts",
+    "smoke": "node --env-file-if-exists=.env scripts/smoke.ts",
+    "eval": "node --env-file-if-exists=.env scripts/eval.ts",
+    "collect": "node scripts/collect.ts",
+    "fetch-ham": "node scripts/fetch-ham.ts"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

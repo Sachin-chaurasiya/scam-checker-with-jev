@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Is this a scam?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #edf0f3;
+    --surface: #ffffff;
+    --field: #f7f9fb;
+    --ink: #10151b;
+    --ink-soft: #4a5663;
+    --rule: #d3dae1;
+    --accent: #0e6e66;
+    --accent-ink: #ffffff;
+
+    --danger-ink: #8e2820; --danger-bg: #fbe9e6; --danger-rule: #e4b2aa;
+    --warn-ink: #8a5a06;   --warn-bg: #fcf2df;   --warn-rule: #e8cd9a;
+    --safe-ink: #245c44;   --safe-bg: #e6f1ea;   --safe-rule: #aecfbc;
+    --flat-ink: #3f4a56;   --flat-bg: #e7ebef;   --flat-rule: #c6cfd8;
+
+    --step--1: 0.875rem;
+    --step-0: 1.0625rem;
+    --step-1: 1.25rem;
+    --step-2: 1.625rem;
+    --step-3: 2.25rem;
+
+    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141a;
+      --surface: #161d25;
+      --field: #111821;
+      --ink: #e7ecf2;
+      --ink-soft: #9aa7b5;
+      --rule: #28323d;
+      --accent: #4fbfb2;
+      --accent-ink: #06231f;
+
+      --danger-ink: #ffb3a8; --danger-bg: #2a1512; --danger-rule: #5a2620;
+      --warn-ink: #f3c77a;   --warn-bg: #261c0c;   --warn-rule: #4e3a14;
+      --safe-ink: #8bd3ac;   --safe-bg: #10241a;   --safe-rule: #23492f;
+      --flat-ink: #bac5d1;   --flat-bg: #1a212a;   --flat-rule: #2e3845;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: clamp(20px, 5vw, 56px) 16px 40px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.55;
+  }
+  main { width: 100%; max-width: 37rem; margin: 0 auto; }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: var(--step-3);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+  }
+  .lede { color: var(--ink-soft); margin: 0 0 28px; max-width: 34ch; }
+
+  /* compose */
+  form { display: block; }
+  label { display: block; font-weight: 600; font-size: var(--step--1); margin-bottom: 7px; }
+  .hint { display: block; font-weight: 400; color: var(--ink-soft); }
+
+  textarea, input[type=text] {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: var(--field);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 14px 15px;
+  }
+  textarea {
+    min-height: 200px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  textarea::placeholder, input::placeholder { color: var(--ink-soft); opacity: 0.75; }
+  :is(textarea, input, button, a, [tabindex]):focus-visible {
+    outline: 2.5px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .field + .field { margin-top: 18px; }
+
+  button {
+    font: inherit;
+    font-family: var(--sans);
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+  .primary {
+    display: block;
+    width: 100%;
+    min-height: 54px;
+    margin-top: 22px;
+    padding: 14px 20px;
+    font-size: var(--step-1);
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .primary[aria-busy="true"] { opacity: 0.75; cursor: progress; }
+
+  .under-button {
+    margin: 10px 2px 0;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+  .form-error {
+    margin: 12px 2px 0;
+    padding-left: 11px;
+    border-left: 3px solid var(--danger-ink);
+    color: var(--danger-ink);
+    font-size: var(--step--1);
+  }
+  .under-button button {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--accent);
+    font-size: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* verdict */
+  [hidden] { display: none !important; }
+
+  .back {
+    background: none;
+    border: 0;
+    padding: 6px 0;
+    margin-bottom: 18px;
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+  .back:hover { color: var(--ink); }
+
+  .verdict { border-radius: 16px; padding: clamp(20px, 5vw, 30px); border: 1px solid; }
+  .verdict.scam         { background: var(--danger-bg); border-color: var(--danger-rule); --band: var(--danger-ink); }
+  .verdict.injection,
+  .verdict.unsure       { background: var(--warn-bg);   border-color: var(--warn-rule);   --band: var(--warn-ink); }
+  .verdict.clear        { background: var(--safe-bg);   border-color: var(--safe-rule);   --band: var(--safe-ink); }
+  .verdict.cannot_judge,
+  .verdict.error        { background: var(--flat-bg);   border-color: var(--flat-rule);   --band: var(--flat-ink); }
+
+  .mark { display: block; width: 34px; height: 34px; color: var(--band); margin-bottom: 14px; }
+
+  .verdict h2 {
+    font-family: var(--serif);
+    font-size: var(--step-3);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--band);
+    margin: 0 0 10px;
+    max-width: 18ch;
+  }
+  .verdict p { margin: 0; max-width: 56ch; }
+  .verdict h2:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 6px; }
+
+  .block { margin-top: 26px; }
+  .block > h3,
+  .checked h3 {
+    font-size: var(--step--1);
+    font-weight: 600;
+    margin: 0 0 12px;
+    color: var(--ink-soft);
+  }
+
+  .todo { margin: 0; padding: 0; list-style: none; }
+  .todo li { margin-bottom: 12px; max-width: 56ch; }
+  .todo li:last-child { margin-bottom: 0; }
+
+  .why { margin: 0; padding: 0; list-style: none; }
+  .why li {
+    border-left: 3px solid var(--band);
+    padding: 3px 0 3px 14px;
+    margin-bottom: 12px;
+    max-width: 52ch;
+  }
+  .why li:last-child { margin-bottom: 0; }
+
+  .checked {
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+  }
+  .checked p {
+    margin: 10px 0 0;
+    padding: 13px 16px;
+    background: var(--surface);
+    border-radius: 14px 14px 14px 4px;
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    max-height: 8.5em;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .checked .cut-short { margin-top: 12px; padding: 0; background: none; color: var(--band); max-height: none; }
+  details { margin-top: 20px; font-size: var(--step--1); color: var(--ink-soft); }
+  details summary { cursor: pointer; }
+  details p { margin-top: 8px; font-variant-numeric: tabular-nums; }
+
+  footer {
+    max-width: 37rem;
+    margin: 30px auto 0;
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .verdict { animation: rise 260ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section id="compose">
+    <h1>Is this a scam?</h1>
+    <p class="lede">Paste a message you were sent. You'll get a straight answer and the reasons behind it.</p>
+
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="message">The message <span class="hint">Paste all of it, including any link</span></label>
+        <textarea id="message" name="message" autocomplete="off" spellcheck="false"
+          placeholder="KYC pending. Your account will be blocked today. Update at ..."></textarea>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="sender">Who it says it's from <span class="hint">Optional. The sender name, number or email</span></label>
+        <input type="text" id="sender" name="sender" autocomplete="off" placeholder="VM-SBIBNK" />
+      </div>
+
+      <button class="primary" id="check" type="submit">Check this message</button>
+      <p class="under-button" id="status">
+        Takes about a second. Or try
+        <button type="button" data-example="scam">a scam</button> or
+        <button type="button" data-example="real">a real message</button>.
+      </p>
+    </form>
+  </section>
+
+  <section id="result" hidden>
+    <button class="back" id="back" type="button">&larr; Check another message</button>
+    <div class="verdict" id="card"></div>
+  </section>
+</main>
+
+<footer>
+  Nothing you paste is saved. This is a second opinion, not a guarantee. When money or an
+  account is involved, contact the company using details you already have.
+</footer>
+
+<script type="module">
+  const form = document.getElementById("form");
+  const messageEl = document.getElementById("message");
+  const senderEl = document.getElementById("sender");
+  const submitEl = document.getElementById("check");
+  const errorEl = document.getElementById("form-error");
+  const composeEl = document.getElementById("compose");
+  const resultEl = document.getElementById("result");
+  const cardEl = document.getElementById("card");
+  const backEl = document.getElementById("back");
+
+  const EXAMPLES = {
+    scam: {
+      message:
+        "SBI ALERT: Your account will be BLOCKED today as your KYC is incomplete. Update immediately at http://sbi-kyc-verify.top/update and share the OTP sent to your phone with our agent to complete verification.",
+      sender: "VM-SBIBNK",
+    },
+    real: {
+      message:
+        "Your OTP for logging in is 481920. It is valid for 10 minutes. Do not share this code with anyone, including bank staff.",
+      sender: "HDFCBK",
+    },
+  };
+
+  // Shape, not colour alone: each verdict is distinguishable without seeing hue.
+  const MARKS = {
+    scam: '<path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 7v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17" r="1.35" fill="currentColor"/>',
+    injection:
+      '<path d="M12 3 22 20H2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17" r="1.3" fill="currentColor"/>',
+    unsure:
+      '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.3 9.2a2.8 2.8 0 1 1 3.4 3.3v1.4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="12.4" cy="17.2" r="1.3" fill="currentColor"/>',
+    clear:
+      '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7.6 12.4 3 3 5.8-6.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+    cannot_judge:
+      '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12h9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+    error:
+      '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.6 8.6l6.8 6.8M15.4 8.6l-6.8 6.8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>',
+  };
+
+  // The server's own wording is plainer than a band name; these are the headlines.
+  const HEADLINE = {
+    scam: "Don't act on this",
+    injection: "Treat this as suspicious",
+    unsure: "I can't tell",
+    clear: "Nothing suspicious found",
+    cannot_judge: "I can't read this one",
+    error: "That didn't go through",
+  };
+
+  const SHOW_EVIDENCE = new Set(["scam", "unsure", "injection"]);
+
+  /** Something the person can fix belongs beside the field, not on a result screen. */
+  function showFormError(text) {
+    errorEl.textContent = text;
+    errorEl.hidden = false;
+    messageEl.focus();
+    errorEl.scrollIntoView({ block: "nearest" });
+  }
+
+  const el = (tag, text, className) => {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  };
+
+  function section(heading, items, className) {
+    const wrap = el("div", undefined, "block");
+    wrap.append(el("h3", heading));
+    const list = el("ul", undefined, className);
+    for (const item of items) list.append(el("li", item));
+    wrap.append(list);
+    return wrap;
+  }
+
+  function show(band, { headline, detail, todo = [], why = [], checked, truncated, meta }) {
+    cardEl.className = `verdict ${band}`;
+    cardEl.replaceChildren();
+
+    const mark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    mark.setAttribute("viewBox", "0 0 24 24");
+    mark.setAttribute("aria-hidden", "true");
+    mark.setAttribute("class", "mark");
+    mark.innerHTML = MARKS[band] ?? MARKS.error;
+    cardEl.append(mark);
+
+    const title = el("h2", headline);
+    title.tabIndex = -1;
+    cardEl.append(title);
+    if (detail) cardEl.append(el("p", detail));
+
+    if (todo.length) cardEl.append(section("What to do", todo, "todo"));
+    if (why.length) cardEl.append(section("Why I think so", why, "why"));
+
+    if (checked) {
+      const wrap = el("div", undefined, "checked");
+      wrap.append(el("h3", truncated ? "What I checked (the message was cut short)" : "What I checked"));
+      wrap.append(el("p", checked));
+      if (truncated) {
+        wrap.append(el("p", "That message was too long, so only the part above was checked.", "cut-short"));
+      }
+      cardEl.append(wrap);
+    }
+
+    if (meta) {
+      const details = el("details");
+      details.append(el("summary", "Show the scoring"));
+      details.append(el("p", meta));
+      cardEl.append(details);
+    }
+
+    composeEl.hidden = true;
+    resultEl.hidden = false;
+    // Start the verdict at the top, so "Check another message" is always in view.
+    window.scrollTo({ top: 0, behavior: "instant" });
+    title.focus({ preventScroll: true });
+  }
+
+  function backToCompose() {
+    resultEl.hidden = true;
+    composeEl.hidden = false;
+    messageEl.value = "";
+    senderEl.value = "";
+    messageEl.focus();
+  }
+
+  backEl.addEventListener("click", backToCompose);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !resultEl.hidden) backToCompose();
+  });
+
+  for (const exampleButton of document.querySelectorAll("[data-example]")) {
+    exampleButton.addEventListener("click", () => {
+      const example = EXAMPLES[exampleButton.dataset.example];
+      messageEl.value = example.message;
+      senderEl.value = example.sender;
+      messageEl.focus();
+    });
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    errorEl.hidden = true;
+
+    const message = messageEl.value;
+    if (!message.trim()) {
+      showFormError("Paste the message first.");
+      return;
+    }
+
+    submitEl.textContent = "Reading the message…";
+    submitEl.setAttribute("aria-busy", "true");
+    submitEl.disabled = true;
+
+    try {
+      const response = await fetch("/api/check", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message, sender: senderEl.value }),
+      });
+      const data = await response.json();
+
+      if (response.status === 400) {
+        showFormError(data.error ?? "That message could not be checked.");
+        return;
+      }
+
+      if (!response.ok) {
+        show("error", {
+          headline: HEADLINE.error,
+          detail: data.error ?? "Try again in a moment.",
+          checked: message,
+        });
+        return;
+      }
+
+      show(data.band, {
+        headline: HEADLINE[data.band] ?? data.title,
+        detail: data.band === "scam" ? `${data.title}. ${data.detail}` : data.detail,
+        todo: data.advice ?? [],
+        truncated: data.truncated === true,
+        // Evidence is only shown when the verdict actually rests on it. Under a
+        // clear result it reads as a contradiction; under "I can't read this"
+        // it contradicts the refusal itself.
+        why: SHOW_EVIDENCE.has(data.band) ? (data.reasons ?? []).map((reason) => reason.text) : [],
+        checked: data.checked ?? message,
+        meta: `risk ${data.risk.toFixed(2)}, ${data.playbook} ${data.playbookConfidence.toFixed(2)}, ${data.model}, ${data.latencyMs} ms`,
+      });
+    } catch {
+      show("error", {
+        headline: HEADLINE.error,
+        detail: "The checker isn't responding. Make sure the server is still running, then try again.",
+        checked: message,
+      });
+    } finally {
+      submitEl.textContent = "Check this message";
+      submitEl.removeAttribute("aria-busy");
+      submitEl.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

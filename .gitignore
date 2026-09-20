@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+out/
+*.log
+
+# local planning notes, not published
+docs/plan-*.md
+
+# real people's messages: fetched with `pnpm fetch-ham`, not redistributed here
+fixtures/public-ham.jsonl
